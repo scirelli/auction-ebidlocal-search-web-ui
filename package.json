@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.29.0",
+    "jasmine": "^3.7.0"
+  },
+  "dependencies": {
+    "@webcomponents/custom-elements": "^1.4.3",
+    "debug": "^4.3.1"
+  }
+}
