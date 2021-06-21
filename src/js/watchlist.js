@@ -1,3 +1,7 @@
+import {default as createLogger} from './logFactory.js';
+
+const logger = createLogger('watchlist');
+
 /*
  * Create User Watchlist
  *     POST /user/{userID}/watchlist
@@ -17,17 +21,18 @@
  * Get watch list
  *     GET /watchlist
  */
-export default class Watchlist {
+export default class Watchlist{
     ONE_SECOND_DELAY = 3000;
 
     constructor(rootElem) {
-        this.userELem = rootElem.querySelector("#user");
-        this.formElem = rootElem.querySelector("#createWatchlistForm");
+        logger.debug('Creating watch list element');
+        this.userELem = rootElem.querySelector('#user');
+        this.formElem = rootElem.querySelector('#createWatchlistForm');
 
-        this.watchlistElem = rootElem.querySelector("#watchlistList");
-        this.watchlistNameElem = rootElem.querySelector("#watchlistName");
+        this.watchlistElem = rootElem.querySelector('#watchlistList');
+        this.watchlistNameElem = rootElem.querySelector('#watchlistName');
         this.watchlistNameErrorElem = rootElem.querySelector('span.watchlist.error');
-        this.addKeywordElem = rootElem.querySelector("#addKeyword");
+        this.addKeywordElem = rootElem.querySelector('#addKeyword');
 
         this.keywordElem = rootElem.querySelector('#keyword');
         this.keywordErrorElem = rootElem.querySelector('span.keyword.error');
@@ -61,7 +66,7 @@ export default class Watchlist {
             this.keywordElem.focus();
         });
 
-        this.keywordElem.addEventListener("keyup", (evt)=> {
+        this.keywordElem.addEventListener('keyup', (evt)=> {
             if(evt.keyCode === 13) {
                 evt.preventDefault();
                 this.addKeywordElem.click();
@@ -91,25 +96,25 @@ export default class Watchlist {
 
             if(!watchlistName) {
                 this.displayInvalidWatchlistName(watchlistName);
-                return false
+                return false;
             }
             if(!watchlist.length) {
                 this.displayInvalidWatchlist(watchlist);
-                return false
+                return false;
             }
 
             if(!userId) {
                 fetch('/user', {
-                    method: 'POST',
-                    cache: 'no-cache',
+                    method:  'POST',
+                    cache:   'no-cache',
                     headers: {
-                      'Content-Type': 'application/json'
+                        'Content-Type': 'application/json'
                     },
-                    redirect: 'follow',
+                    redirect:       'follow',
                     referrerPolicy: 'no-referrer'
                 })
-                  .then(response => response.json())
-                  .then(data => console.log(data));
+                    .then(response => response.json())
+                    .then(data => console.log(data));
             }
 
             return false;
@@ -118,12 +123,12 @@ export default class Watchlist {
 
     isValidKeyword(keyword) {
         if(!keyword) return false;
-        let reg = /\W/g
+        let reg = /\W/g;
 
-        return !reg.test(keyword)
+        return !reg.test(keyword);
     }
 
-    displayInvalidKeywordError(keyword) {
+    displayInvalidKeywordError(/*keyword*/) {
         this.keywordErrorElem.classList.remove('hidden');
         this.keywordElem.classList.add('invalid');
         setTimeout(()=> {
@@ -132,16 +137,16 @@ export default class Watchlist {
         }, this.ONE_SECOND_DELAY);
     }
 
-    displayInvalidWatchlistName(watchlistName) {
+    displayInvalidWatchlistName(/*watchlistName*/) {
         this.watchlistNameErrorElem.classList.remove('hidden');
         this.watchlistNameElem.classList.add('invalid');
         setTimeout(()=> {
             this.watchlistNameErrorElem.classList.add('hidden');
-        this.watchlistNameElem.classList.remove('invalid');
+            this.watchlistNameElem.classList.remove('invalid');
         }, this.ONE_SECOND_DELAY);
     }
 
-    displayInvalidWatchlist(watchlist) {
+    displayInvalidWatchlist(/*watchlist*/) {
         this.keywordListErrorElem.classList.remove('hidden');
         setTimeout(()=> {
             this.keywordListErrorElem.classList.add('hidden');
