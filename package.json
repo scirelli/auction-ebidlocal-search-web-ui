@@ -1,11 +1,37 @@
 {
+  "scripts": {
+    "test": "echo none",
+    "build:debug": "browserify -s debug ./node_modules/debug/src/index.js > ./src/js/vendor/debug.js"
+  },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
+    "browserify": "^17.0.0",
     "eslint": "^7.29.0",
     "jasmine": "^3.7.0"
   },
   "dependencies": {
     "@webcomponents/custom-elements": "^1.4.3",
     "debug": "^4.3.1"
-  }
+  },
+  "name": "auction-ebidlocal-search-web-ui",
+  "version": "1.0.0",
+  "description": "A UI for the Ebidlocal Watch list API",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scirelli/auction-ebidlocal-search-web-ui.git"
+  },
+  "keywords": [
+    "ebidlocal",
+    "watchlist",
+    "watch",
+    "list",
+    "ui"
+  ],
+  "author": "Steve Cirelli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/scirelli/auction-ebidlocal-search-web-ui/issues"
+  },
+  "homepage": "https://github.com/scirelli/auction-ebidlocal-search-web-ui#readme"
 }
