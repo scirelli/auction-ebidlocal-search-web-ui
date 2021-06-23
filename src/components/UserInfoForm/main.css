@@ -1,0 +1,87 @@
+:root {
+    --bg-color: #1F2227;
+    --font-color: #F0F0F0;
+    --close-color-hover: #77FF77;
+}
+
+.hidden {
+    display: none;
+}
+
+.dialog-window {
+    position:absolute;
+    margin: 0 auto;
+    width: 20vw;
+    min-height: 20vh;
+    background: #FFF;
+    border-radius: 5px;
+    border:1px solid black;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.dialog-window .title-bar {
+  min-height: 5vh;
+  padding: 3px;
+  background-color:#DDDDDD;
+  padding-left: 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #AAAAAA;
+  text-align: center;
+}
+
+.dialog-window .title {
+    margin-top: 5px;
+}
+
+.dialog-window .content {
+    padding: 3px;
+}
+
+.dialog-window .content input {
+    display: inline-block;
+}
+
+.dialog-window .content input[type="submit"] {
+    margin-top: 10px;
+}
+
+.dialog-window .title-bar button.close {
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  cursor: pointer;
+}
+
+button.close .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+.dialog-window .title-bar button.close::before,
+.dialog-window .title-bar button.close::after {
+    content: '';
+    width: 1px;
+    height: 100%;
+    background: #333;
+    display: block;
+    transform: rotate(45deg) translateX(0px);
+    position: absolute;
+    left: 50%;
+    top: 0;
+}
+
+.dialog-window .title-bar button.close::after {
+    transform: rotate(-45deg) translateX(0px);
+}

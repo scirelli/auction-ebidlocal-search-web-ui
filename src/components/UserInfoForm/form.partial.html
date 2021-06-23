@@ -1,0 +1,20 @@
+<div class="dialog-window">
+    <div class="title-bar">
+        <header class="title">Create User</header>
+        <button class="close" name="close" tabindex="0"><span class="sr-only">Close</span></button>
+    </div>
+    <div class="content">
+        <form class="create-user-form" action="/api/user" method="POST">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" class="user-name" name="name" placeholder="User Name" title="Enter a user name."/>
+            </div>
+
+            <div>
+                <label for="email">Email:</label>
+                <input type="text" class="user-email" name="email" placeholder="Email address" title="Enter a user email address. You will recieve a varification email."/>
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>

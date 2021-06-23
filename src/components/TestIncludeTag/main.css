@@ -1,0 +1,66 @@
+td.photo a {
+    display:inline-block;
+    height: 50px;
+}
+img {
+    height: 100%;
+}
+a:hover img {
+    display:none;
+}
+a:hover img.icon-large {
+    display:inline;
+    height: 400px;
+    visibility: visible;
+    transition: height 0.2s ease-out;
+}
+img.icon-large {
+    position: absolute;
+    visibility: hidden;
+    height: 50px;
+}
+
+tbody tr.updating {
+    background-color: #DDFFDD;
+    transition: background-color 0.2s ease-out;
+}
+tbody tr.changed {
+    background-color: #FFDDFF;
+    transition: background-color 0.2s ease-out;
+}
+tbody tr{
+    transition: background-color 0.2s ease-out;
+}
+
+tr:nth-of-type(odd).updating-animated {
+    background: linear-gradient(0deg, #EEE, #DDFFDD, #EEE, #EEE);
+    background-size: 400% 300%;
+
+    -webkit-animation: UpdateAnimation 1s ease 1;
+    -moz-animation: UpdateAnimation 1s ease 1;
+    animation: UpdateAnimation 1s ease 1;
+}
+tr.updating-animated {
+    background: linear-gradient(0deg, transparent, #DDFFDD, transparent, transparent);
+    background-size: 400% 300%;
+
+    -webkit-animation: UpdateAnimation 1s ease 1;
+    -moz-animation: UpdateAnimation 1s ease 1;
+    animation: UpdateAnimation 1s ease 1;
+}
+
+@-webkit-keyframes UpdateAnimation {
+    0%{background-position:50% 0%}
+    100%{background-position:50% -150%}
+}
+@-moz-keyframes UpdateAnimation {
+    0%{background-position:50% 0%}
+    100%{background-position:50% -150%}
+}
+@keyframes UpdateAnimation {
+    0%{background-position:50% 0%}
+    100%{background-position:50% -150%}
+}
+.invisible {
+    visibility: hidden;
+}

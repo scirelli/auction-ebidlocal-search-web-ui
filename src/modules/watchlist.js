@@ -1,25 +1,27 @@
 import {default as createLogger} from './logFactory.js';
+import '../components/UserInfoForm/main.js';
 
 const logger = createLogger('watchlist');
 
 /*
- * Create User Watchlist
- *     POST /user/{userID}/watchlist
+ * Create User Watchlist ???? <---- Look into this one
+ *     POST /api/user/{userID}/watchlist
  *
  * Get User Wathclist
- *     GET /user/{userID}/watchlist/{listID}
+ *     GET /api/user/{userID}/watchlist/{listID}
  *
  * Create User
- *     POST /user
+ *     POST /api/user
+ *     --data '{"name": "Steve C.", "email": "scirelli+ebidlocal@gmail.com"}' \
  *
  * Get user data
- *     GET /user/{userID}/data.json
+ *     GET /api/user/{userID}/data.json
  *
  * Get static files
- *     GET /user/{userID}/
+ *     GET /api/user/{userID}/
  *
  * Get watch list
- *     GET /watchlist
+ *     GET /api/watchlist
  */
 export default class Watchlist{
     ONE_SECOND_DELAY = 3000;
@@ -104,17 +106,22 @@ export default class Watchlist{
             }
 
             if(!userId) {
-                fetch('/user', {
-                    method:  'POST',
-                    cache:   'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    redirect:       'follow',
-                    referrerPolicy: 'no-referrer'
-                })
-                    .then(response => response.json())
-                    .then(data => console.log(data));
+                this.displayRequestUserInfo().then((user)=>{
+                    fetch('/api/user', {
+                        method:  'POST',
+                        cache:   'no-cache',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        redirect:       'follow',
+                        referrerPolicy: 'no-referrer',
+                        body:           JSON.stringify(user)
+                    })
+                        .then(response => response.json())
+                        .then(data => console.log(data)).catch(e=> {
+                            logger.error(e);
+                        });
+                });
             }
 
             return false;
@@ -152,4 +159,15 @@ export default class Watchlist{
             this.keywordListErrorElem.classList.add('hidden');
         }, this.ONE_SECOND_DELAY);
     }
+
+    displayRequestUserInfo() {
+        return new Promise((resolve/*, reject*/)=>{
+            resolve(new User());
+        });
+    }
+}
+
+function User(name, email) {
+    this.name = name;
+    this.email = email;
 }
