@@ -43,18 +43,19 @@ class UserInfoForm extends HTMLElement{
         closeButton.addEventListener('click', ()=>{
             this.classList.add('hidden');
             dialogWindow.querySelectorAll('input').forEach(elem=>{
-                elem.value = '';
+                if(elem.value !== 'Submit') elem.value = '';
             });
+            this.dispatchEvent(new CustomEvent('dialog-closed', {bubbles: true, detail: {}}));
         });
 
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', event => {
             event.preventDefault();
             let data = {};
             for(var pair of (new FormData(form)).entries()) {
                 data[pair[0]] = pair[1];
             }
-            fetch('/api/user', {
-                method:  'POST',
+            fetch(form.action, {
+                method:  form.method,
                 cache:   'no-cache',
                 headers: {
                     'Content-Type': 'application/json'
@@ -62,11 +63,25 @@ class UserInfoForm extends HTMLElement{
                 redirect:       'follow',
                 referrerPolicy: 'no-referrer',
                 body:           JSON.stringify(data)
-            }).catch(e=>{
-                logger.error(e);
-            });
+            })
+                .then(response=>response.json())
+                .then((responseData)=>{
+                    this.dispatchEvent(new CustomEvent('dialog-form-result', {bubbles: true, detail: responseData}));
+                })
+                .then(()=>{
+                    closeButton.click();
+                })
+                .catch(e=>{
+                    //TODO: Show error.
+                    logger.error(e);
+                });
 
             return false;
+        });
+
+        this.addEventListener('dialog-open', ()=>{
+            this.classList.remove('hidden');
+            this.shadowRoot.querySelector('.user-name').focus();
         });
     }
 

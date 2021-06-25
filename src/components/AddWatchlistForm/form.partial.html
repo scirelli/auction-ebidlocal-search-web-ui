@@ -1,0 +1,34 @@
+<form id="createWatchlistForm" action="/api/user/{{user}}/watchlist" method="post">
+    <!-- User Id -->
+    <label for="user">User:</label>
+    <input type="text" class="user" id="user" name="user" placeholder="User id" title="If no user id is entered a new one will be generated for you."/>
+    <input type="button" class="user" id="createUser" name="createUser" value="New User"/>
+    <span class="user error hidden">User id is required. Please create one.</span>
+    <user-info-form class="user hidden"></user-info-form>
+
+    <!-- Watch list Name -->
+    <label for="watchlist">Watch List:</label>
+    <input type="text" class="watchlist" id="watchlistName" name="name" placeholder="Watch list Name" title="Name your watch list. This is required."/>
+    <span class="watchlist error hidden">Watch list name is required</span>
+
+    <!-- Keywords -->
+    <input type="text"   class="keyword" id="keyword"    name="keyword" placeholder="keyword" title="Enter a keyword press add to add it to your watch list."/>
+    <input type="button" class="keyword" id="addKeyword" name="addKeyword" value="Add Keyword"/>
+    <span class="keyword error hidden">Invalid keyword</span>
+
+    <!-- Keyword List -->
+    <span class="keywordlist error hidden">Invalid keyword</span>
+    <input type="hidden" id="list" name="list" value=""/>
+    <ul   class="keyword" id="watchlistList"></ul>
+
+    <hr/>
+
+    <input type="submit" value="Submit"/>
+    <input type="button" id="clear" name="clear" value="Clear"/>
+    <span class="submit error hidden">Failed to create watchlist.</span>
+    <ul class="submit" id="createdWatchlists">
+    </ul>
+    <template id="watchlistCreatedTemplate">
+        <li class="submit success">Watch list created <a href="{{url}}">{{watchlistName}}</a></li>
+    </template>
+</form>

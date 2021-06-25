@@ -9,15 +9,11 @@ function queryStrToObj(str) {
     for(let i=0; i<str.length; i++) {
         let [key, value] = str[i].split('=');
         value = value ? unescape(value) : null;
-
-        if(!obj[key]) {
-            obj[key] = value;
+        key = unescape(key);
+        if(key in obj) {
+            obj[key] = [].concat(obj[key], value);
         }else{
-            if(Array.isArray(obj[key])) {
-                obj[key].push(value);
-            }else{
-                obj[key] = [obj[key], value];
-            }
+            obj[key] = value;
         }
     }
     return obj;
@@ -43,6 +39,20 @@ function searchtoObj() {
     return queryStrToObj(str.substr(1, str.length));
 }
 
+function searchObjToStr(searchObj) {
+    let str = [];
+    for(let key in searchObj) {
+        let value = searchObj[key];
+        key = encodeURIComponent(key);
+        if(Array.isArray(value)) {
+            value = value.map(encodeURIComponent).map((v)=>`${key}${v?'='+v:''}`);
+        }else{
+            value = `${key}${value?'='+encodeURIComponent(value):''}`;
+        }
+        str = str.concat(value);
+    }
+    return str.length ? '?' + str.join('&') : '';
+}
 //---------------------------------------------------------
 // Desc: Converts the hash portion of the current URL to a obj
 //---------------------------------------------------------
@@ -53,10 +63,63 @@ function hashVariables() {
 
 
 //---- Build the query string obj ----
-window.location.searchObj =  searchtoObj();
 window.location.baseURL   = baseURL();
-window.location.hashObj   = hashVariables();
-if( !window.location.origin ) window.location.origin = origin();
+Object.defineProperty(window.location, 'searchObj', {
+    get: searchtoObj
+});
+window.location.addSearch = function(key, value) {
+    if(!key) return;
+    let searchObj = window.location.searchObj;
+    if(key in searchObj) {
+        searchObj[key] = [].concat(searchObj[key], value);
+    } else{
+        searchObj[key] = [].concat(value);
+    }
+    history.replaceState(null, '', searchObjToStr(searchObj) + window.location.hash);
+};
+window.location.pushSearch = function(key, value) {
+    if(!key) return;
+    let searchObj = window.location.searchObj;
+    if(key in searchObj) {
+        searchObj[key] = [].concat(searchObj[key], value);
+    } else{
+        searchObj[key] = [].concat(value);
+    }
+    history.pushState(null, '', searchObjToStr(searchObj) + window.location.hash);
+};
+window.location.removeSearch = function(key) {
+    if(!key) return;
+    let searchObj = window.location.searchObj;
+    delete searchObj[key];
+    history.replaceState(null, '', searchObjToStr(searchObj) + window.location.hash);
+};
+
+Object.defineProperty(window.location, 'hashObj', {
+    get: hashVariables
+});
+window.location.addHash = function(key, value) {
+    var cur = window.location.hashObj,
+        hash = [];
+    key = encodeURIComponent(key);
+    value = encodeURIComponent(value);
+    cur[key] = value;
+    for(let prop in cur) {
+        hash.push(`${prop}=${cur[prop]}`);
+    }
+    window.location.hash = '#' + hash.join('#');
+};
+window.location.removeHash = function(key) {
+    var cur = window.location.hashObj,
+        hash = [];
+    key = encodeURIComponent(key);
+    delete cur[key];
+    for(let prop in cur) {
+        hash.push(`${prop}=${cur[prop]}`);
+    }
+    window.location.hash = '#' + hash.join('#');
+};
+
+if(!window.location.origin) window.location.origin = origin();
 
 /*
 window.location.prototype.searchObj = function(){
@@ -69,4 +132,4 @@ window.location.prototype.searchObj = function(){
     return obj;
 }
 */
-export default { hashVariables, searchtoObj, baseURL, origin, queryStrToObj };
+export default {hashVariables, searchtoObj, baseURL, origin, queryStrToObj};

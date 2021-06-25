@@ -31,8 +31,8 @@
   text-align: center;
 }
 
-.dialog-window .title-bar .title {
-    margin-top: 0px;
+.dialog-window .title {
+    margin-top: 5px;
 }
 
 .dialog-window .content {
@@ -40,15 +40,6 @@
     overflow: scroll;
     min-width: 100px;
     min-height: 100px;
-}
-
-.dialog-window .content input {
-    display: inline-block;
-    margin: 3px;
-}
-
-.dialog-window .content input[type="submit"] {
-    margin-top: 10px;
 }
 
 .dialog-window .title-bar button.close {

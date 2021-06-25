@@ -1,9 +1,10 @@
-import {default as createLogger} from './logFactory.js';
-import '../components/UserInfoForm/main.js';
-import './extras-location.js';
-import './String.js';
+import {default as createLogger} from '../../modules/logFactory.js';
+import {fetchHtmlElements, fetchStyleElements} from '../../modules/extras-html.js';
+import '../UserInfoForm/main.js';
+import '../../modules/extras-location.js';
+import '../../modules/String.js';
 
-const logger = createLogger('watchlist');
+const logger = createLogger('WatchlistForm');
 
 /*
  * Create User Watchlist ???? <---- Look into this one
@@ -25,14 +26,27 @@ const logger = createLogger('watchlist');
  * Get watch list
  *     GET /api/watchlist
  */
-export default class Watchlist{
-    ONE_SECOND_DELAY = 3000;
-    MESSAGE_CLOSE_DEPLAY = 3000;
+class WatchlistForm extends HTMLElement{
+    static TAG_NAME = 'add-watchlist-form';
+    static ONE_SECOND_DELAY = 3000;
+    static MESSAGE_CLOSE_DEPLAY = 3000;
 
-    constructor(rootElem) {
+    constructor() {
+        super();
         logger.debug('Creating watch list element');
 
-        this.init(rootElem);
+        this.attachShadow({mode: 'open'});
+        this._promiseOfContent = Promise.allSettled([
+            fetchHtmlElements(['/components/AddWatchlistForm/form.partial.html']).then(elems => this.shadowRoot.append(...elems)),
+            fetchStyleElements(['/components/AddWatchlistForm/main.css']).then(elems => this.shadowRoot.append(...elems))
+        ])
+            .then(()=>{
+                this.init(this.shadowRoot);
+            })
+            .finally(()=>{
+                this.dispatchEvent(new CustomEvent('dynamic-content-loaded', {bubbles: true}));
+                logger.debug('WatchlistForm created');
+            });
     }
 
     init(rootElem) {
@@ -245,6 +259,13 @@ export default class Watchlist{
         elem.classList.remove('hidden');
         setTimeout(()=>{
             elem.classList.add('hidden');
-        }, Watchlist.MESSAGE_CLOSE_DEPLAY);
+        }, WatchlistForm.MESSAGE_CLOSE_DEPLAY);
+    }
+
+    static __registerElement() {
+        customElements.define(WatchlistForm.TAG_NAME, WatchlistForm);
     }
 }
+
+WatchlistForm.__registerElement();
+export default WatchlistForm;
