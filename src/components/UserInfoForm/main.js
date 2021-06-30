@@ -6,8 +6,6 @@ const logger = createLogger('UserInfoForm');
 class UserInfoForm extends HTMLElement{
     static TAG_NAME = 'user-info-form';
 
-    static get observedAttributes() { return ['data-refresh-rate']; }
-
     constructor() {
         super();
 
@@ -23,15 +21,6 @@ class UserInfoForm extends HTMLElement{
                 this.dispatchEvent(new CustomEvent('dynamic-content-loaded', {bubbles: true}));
                 logger.debug('UserInfoForm created');
             });
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        switch(name) {
-            case 'data-refresh-rate':
-                this.refreshRate =  (parseInt(newValue) || 0) * 1000;
-                this._startRefresh();
-                break;
-        }
     }
 
     _registerEventListeners() {

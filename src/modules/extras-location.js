@@ -91,7 +91,7 @@ window.location.removeSearch = function(key) {
     if(!key) return;
     let searchObj = window.location.searchObj;
     delete searchObj[key];
-    history.replaceState(null, '', searchObjToStr(searchObj) + window.location.hash);
+    history.replaceState(null, '', (searchObjToStr(searchObj) + window.location.hash) || '?');
 };
 
 Object.defineProperty(window.location, 'hashObj', {

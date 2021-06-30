@@ -12,11 +12,13 @@ class UserInfoForm extends HTMLElement{
         super();
 
         this.attachShadow({mode: 'open'});
+        this._loaded = false;
         Promise.allSettled([
             fetchHtmlElements(['/components/DialogWindow/dialogWindow.partial.html']).then(elems => this.shadowRoot.append(...elems)),
             fetchStyleElements(['/components/DialogWindow/main.css']).then(elems => this.shadowRoot.append(...elems))
         ]).then(()=>{
             this._registerEventListeners();
+            this._loaded = true;
         }).catch(e=>{
             this.dispatchEvent(new CustomEvent('dialog-error', {bubbles: true, detail: {error: e, elem: this.shadowRoot}}));
         }).finally(()=>{
@@ -26,6 +28,12 @@ class UserInfoForm extends HTMLElement{
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
+        if(!this._loaded) {
+            this._promiseOfContent.then(()=> {
+                this.attributeChangedCallback(name, oldValue, newValue);
+            });
+            return;
+        }
         if(oldValue === newValue) return;
         switch(name) {
             case 'data-content-url':

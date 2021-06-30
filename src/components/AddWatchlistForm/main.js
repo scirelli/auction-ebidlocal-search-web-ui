@@ -36,12 +36,14 @@ class WatchlistForm extends HTMLElement{
         logger.debug('Creating watch list element');
 
         this.attachShadow({mode: 'open'});
+        this._loaded = false;
         this._promiseOfContent = Promise.allSettled([
             fetchHtmlElements(['/components/AddWatchlistForm/form.partial.html']).then(elems => this.shadowRoot.append(...elems)),
             fetchStyleElements(['/components/AddWatchlistForm/main.css']).then(elems => this.shadowRoot.append(...elems))
         ])
             .then(()=>{
                 this.init(this.shadowRoot);
+                this._loaded = true;
             })
             .finally(()=>{
                 this.dispatchEvent(new CustomEvent('dynamic-content-loaded', {bubbles: true}));
