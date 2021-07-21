@@ -1,0 +1,53 @@
+.editor-container {
+    display: flex;
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.tabs {
+    width: 100%;
+    font-size: .9rem;
+    flex: none;
+}
+
+.tabbed-standard {
+    height: 370px;
+}
+
+.hidden, ::slotted(.hidden) {
+    display: none !important;
+}
+
+::slotted(*) {
+    box-sizing: border-box;
+}
+
+
+::slotted(button[aria-selected=true]) {
+    color: #83d0f2;
+    border-top: 3px solid #83d0f2;
+    background-color: #333;
+    outline: 0;
+}
+
+::slotted(button[role=tab]:focus), ::slotted(button[role=tab]:hover)  {
+    background-color: #333;
+    color: #fff;
+    outline: 0;
+}
+
+::slotted(button) {
+    background-color: #fff;
+    color: #333;
+    padding: 10px 20px;
+    border: 1px solid #333;
+    border-bottom: 0;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+::slotted(section[role=tabpanel]) {
+    height: 100vh;
+    max-width: 100%;
+    width: 100%;
+}

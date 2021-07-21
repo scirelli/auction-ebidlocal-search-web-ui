@@ -28,9 +28,14 @@
             <h1>This page requires Javascript.</h1>
         </noscript>
 
-        <a class="home" href="/" >Home</a>
-        <section class="noscript">
-            <view-watchlists></view-watchlists>
+        <nav aria-labelledby="primary-navigation">
+            <ul id="primary-navigation">
+                <li><a class="home" href="/" >Home</a></li>
+            </ul>
+        </nav>
+
+        <section>
+            <tab-view id="userWatchlist"></tab-view>
         </section>
     </body>
 </html>
