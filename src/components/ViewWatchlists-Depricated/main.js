@@ -30,7 +30,11 @@ class ViewWatchlists extends HTMLElement{
     static ONE_SECOND_DELAY = 3000;
     static MESSAGE_CLOSE_DEPLAY = 3000;
 
-    static get observedAttributes() { return ['data-watchlist-url']; }
+    /*
+     * data-watchlist-url: Url to load watch list from
+     * data-fire-event: Suppress the href click and just dispatch a click event.
+    */
+    static get observedAttributes() { return ['data-watchlist-url', 'data-fire-event']; }
 
     constructor() {
         super();
@@ -38,11 +42,12 @@ class ViewWatchlists extends HTMLElement{
 
         this.userId = '';
         this._loaded = false;
+        this._shouldFireOnly = false;
         this._setUserId(window.location.searchObj.id);
         this.attachShadow({mode: 'open'});
         this._promiseOfContent = this._loadContent(
-            ['/components/ViewWatchlists/list.partial.html'],
-            ['/components/ViewWatchlists/main.css']
+            ['/components/ViewWatchlists-Depricated/list.partial.html'],
+            [/*'/components/ViewWatchlists-Depricated/main.css'*/]
         ).then(()=>{
             this._init(this.shadowRoot);
             this._loaded = true;
@@ -60,6 +65,9 @@ class ViewWatchlists extends HTMLElement{
         switch(name) {
             case 'data-watchlist-url':
                 this._loadWarchlistFromUrl(newValue);
+                break;
+            case 'data-fire-event':
+                this._shouldFireOnly = newValue === null ? false : true;
                 break;
         }
     }
@@ -132,6 +140,8 @@ class ViewWatchlists extends HTMLElement{
             .then((elems)=>{
                 let detail = elems.length ? {elem: elems} : {error: new Error('Failed to load'), url: url};
                 this.dispatchEvent(new CustomEvent('watchlist-loaded', {bubbles: true, detail: detail}));
+            }).catch(e=>{
+                logger.error(e);
             });
     }
 
@@ -140,6 +150,11 @@ class ViewWatchlists extends HTMLElement{
             anchor = docFrag.querySelector('a');
         anchor.innerText = listName;
         anchor.href = link;
+        anchor.addEventListener('click', (e)=> {
+            e.preventDefault();
+            this.dispatchEvent(new CustomEvent('watchlist-item-click', {bubbles: true, detail: {href: link, name: listName}}));
+            return false;
+        });
         return docFrag;
     }
 
