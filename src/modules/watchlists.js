@@ -11,6 +11,9 @@ import '../../modules/extras-location.js';
 
     if(userId) {
         logger.debug(`Adding user id ${userId}`);
+        Array.prototype.slice.call(document.querySelectorAll('li a')).forEach(elem=> {
+            elem.href = elem.href + '?id=' + encodeURIComponent(userId);
+        });
         requestWatchlist(`/api/user/${userId}/data.json`).then(addWatchListToTabView);
     }
 
