@@ -2,9 +2,7 @@ import {default as createLogger} from '../../modules/logFactory.js';
 import {fetchHtmlElements, fetchStyleElements} from '../../modules/extras-html.js';
 import '../UserInfoForm/main.js';
 import '../../modules/extras-location.js';
-import '../../modules/extras-css.js';
 import '../../modules/String.js';
-import {requestUserWatchlists, requestWatchlist} from '../../modules/apiUtils.js';
 
 const logger = createLogger('WatchlistForm');
 
@@ -33,8 +31,6 @@ class WatchlistForm extends HTMLElement{
     static ONE_SECOND_DELAY = 3000;
     static MESSAGE_CLOSE_DEPLAY = 3000;
 
-    static get observedAttributes() { return ['data-edit', 'edit', 'user-id', 'data-user-id', 'data-hide-user-form', 'hide-user-form']; }
-
     constructor() {
         super();
         logger.debug('Creating watch list element');
@@ -55,34 +51,6 @@ class WatchlistForm extends HTMLElement{
             });
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if(!this._loaded) {
-            this._promiseOfContent.then(()=> {
-                this.attributeChangedCallback(name, oldValue, newValue);
-            });
-            return;
-        }
-        if(oldValue === newValue) return;
-        switch(name) {
-            case 'data-edit':
-            case 'edit':
-                this._editWatchlist(newValue);
-                break;
-            case 'data-user-id':
-            case 'user-id':
-                this._setUserId(newValue);
-                break;
-            case 'data-hide-user-form':
-            case 'hide-user-form':
-                if(this.hasAttribute('data-hide-user-form') || this.hasAttribute('hide-user-form')) {
-                    this.userFormElem.classList.add('hidden');
-                }else{
-                    this.userFormElem.classList.remove('hidden');
-                }
-                break;
-        }
-    }
-
     init(rootElem) {
         this.userElem = rootElem.querySelector('#user');
         this.createUserElem = rootElem.querySelector('#createUser');
@@ -99,10 +67,10 @@ class WatchlistForm extends HTMLElement{
         this.submitElem = rootElem.querySelector('input[type="submit"]');
         this.submitErrorElem = rootElem.querySelector('span.submit.error');
         this.submitSuccessTemplate = rootElem.querySelector('#watchlistCreatedTemplate');
-        this.editSuccessTemplate = rootElem.querySelector('#watchlistEditedTemplate');
         this.createdWatchlists = rootElem.querySelector('#createdWatchlists');
         this.clearElem = rootElem.querySelector('#clear');
-        this.userFormElem = rootElem.querySelector('.user-form');
+
+        this._setUserId(window.location.searchObj.id);
 
         this._attachEventListeners();
     }
@@ -118,8 +86,9 @@ class WatchlistForm extends HTMLElement{
             this.addKeywordElem.disabled = true;
             this.keywordElem.disabled = true;
 
-            this._addKeyWord(keyword);
-            this._sortKeywords();
+            let li = document.createElement('li');
+            li.innerText = keyword;
+            this.watchlistElem.appendChild(li);
 
             this.addKeywordElem.disabled = false;
             this.keywordElem.disabled = false;
@@ -154,7 +123,7 @@ class WatchlistForm extends HTMLElement{
                     return li.innerText.trim();
                 }),
                 watchlistName = this.watchlistNameElem.value,
-                userId = this._getUserId(),
+                userId = this.userElem.value,
                 valid = true;
 
             if(!watchlistName) {
@@ -181,7 +150,10 @@ class WatchlistForm extends HTMLElement{
 
         this.clearElem.addEventListener('click', (e)=> {
             e.preventDefault();
-            this._clearForm();
+            this.watchlistNameElem.value = '';
+            this.keywordElem.value = '';
+            this.watchlistElem.innerHTML = '';
+            this.watchlistNameElem.focus();
             return false;
         });
 
@@ -197,10 +169,6 @@ class WatchlistForm extends HTMLElement{
         return this;
     }
 
-    _getUserId() {
-        return this.userElem.value;
-    }
-
     _submitForm() {
         let data = {},
             form = this.formElem;
@@ -208,7 +176,7 @@ class WatchlistForm extends HTMLElement{
         for(var pair of (new FormData(form)).entries()) {
             data[pair[0]] = pair[1];
         }
-        data.list = Array.prototype.slice.call(this.watchlistElem.querySelectorAll('button')).map(e=>e.value.trim());
+        data.list = Array.prototype.slice.call(this.watchlistElem.children).map(e=>e.textContent.trim());
         fetch(decodeURI(form.action).mustache(data), {
             method:  form.method,
             cache:   'no-cache',
@@ -221,14 +189,7 @@ class WatchlistForm extends HTMLElement{
         })
             .then(response=>response.json())
             .then((responseData)=>{
-                if(this.getAttribute('data-edit') || this.getAttribute('edit')) {
-                    this._displayEditedWatchlist(data.name, responseData.watchlistID);
-                    window.location.removeSearch('watchlistId');
-                    window.location.addSearch('watchlistId', responseData.watchlistID);
-                    this.setAttribute('data-edit', responseData.watchlistID);
-                }else{
-                    this._displayNewWatchlist(data.name, responseData.watchlistID);
-                }
+                this.displayNewWatchlist(data.name, responseData.watchlistID);
             })
             .catch(e=>{
                 logger.error(e);
@@ -288,22 +249,10 @@ class WatchlistForm extends HTMLElement{
         });
     }
 
-    _displayNewWatchlist(name, id) {
-        let userId = window.encodeURIComponent(this._getUserId());
-        id = window.encodeURIComponent(id);
-        return this._displaySubmitSuccess(this.submitSuccessTemplate, {url: `viewwatchlists.html?id=${userId}#${id}`, watchlistName: name});
-    }
-
-    _displayEditedWatchlist(name, id) {
-        let userId = window.encodeURIComponent(this._getUserId());
-        id = id.escapeForCSS();
-        return this._displaySubmitSuccess(this.editSuccessTemplate, {url: `viewwatchlists.html?id=${userId}#${id}`, watchlistName: name});
-    }
-
-    _displaySubmitSuccess(template, data) {
-        let docFrag = template.content.cloneNode(true);
+    displayNewWatchlist(name, id) {
+        let docFrag = this.submitSuccessTemplate.content.cloneNode(true);
         Array.prototype.slice.call(docFrag.children).forEach(e=>{
-            e.innerHTML = e.innerHTML.mustache(data);
+            e.innerHTML = e.innerHTML.mustache({url: `/api/watchlist/${id}`, watchlistName: name});
         });
         this.createdWatchlists.appendChild(docFrag);
     }
@@ -313,81 +262,6 @@ class WatchlistForm extends HTMLElement{
         setTimeout(()=>{
             elem.classList.add('hidden');
         }, WatchlistForm.MESSAGE_CLOSE_DEPLAY);
-    }
-
-    _editWatchlist(listId) {
-        this._requestWatchlist(listId).then(list=> {
-            logger.info(list);
-            this._clearForm();
-            this.watchlistNameElem.value = list.name;
-            list.items.sort().forEach(this._addKeyWord.bind(this));
-        }).catch(e=>{
-            logger.error(e);
-        });
-    }
-
-    _requestWatchlist(listId) {
-        return requestUserWatchlists(this._getUserId()).then(watchlists=>{
-            let name = '';
-
-            if(watchlists[listId]) {
-                name = listId;
-                listId = watchlists[name];
-            }else{
-                for(let n in watchlists) {
-                    if(listId === watchlists[n]) {
-                        name = n;
-                        break;
-                    }
-                }
-            }
-
-            if(!name) throw new Error('Could not find watch list', listId);
-
-            return {
-                name:  name,
-                id:    listId,
-                items: []
-            };
-        }).then(wl=> {
-            return requestWatchlist(wl.id).then(items=>{
-                wl.items = items;
-                return wl;
-            });
-        });
-    }
-
-    _clearForm() {
-        this.watchlistNameElem.value = '';
-        this.keywordElem.value = '';
-        this.watchlistElem.innerHTML = '';
-        this.watchlistNameElem.focus();
-    }
-
-    _addKeyWord(keyword) {
-        let li = document.createElement('li'),
-            button = document.createElement('button');
-        li.appendChild(button);
-        li.classList.add('list-item');
-        button.type = 'button';
-        button.value = keyword;
-        button.innerHTML = `<span title="Delete keyword">x</span> ${keyword}`;
-        button.addEventListener('click', ()=>{
-            button.remove();
-        });
-        this.watchlistElem.appendChild(li);
-    }
-
-    _sortKeywords() {
-        Array.prototype.slice.call(this.watchlistElem.querySelectorAll('.list-item'), 0).sort((li1, li2) => {
-            let v1 = li1.querySelector('button').value,
-                v2 = li2.querySelector('button').value;
-            if(v1 > v2) return 1;
-            if(v1 < v2) return -1;
-            if(v1 === v2) return 0;
-        }).forEach(li=>{
-            this.watchlistElem.appendChild(li);
-        });
     }
 
     static __registerElement() {

@@ -1,12 +1,10 @@
 <form id="createWatchlistForm" action="/api/user/{{user}}/watchlist" method="post">
     <!-- User Id -->
-    <div class="user-form">
-        <label for="user">User:</label>
-        <input type="text" class="user" id="user" name="user" placeholder="User id" title="If no user id is entered a new one will be generated for you."/>
-        <input type="button" class="user" id="createUser" name="createUser" value="New User"/>
-        <span class="user error hidden">User id is required. Please create one.</span>
-        <user-info-form class="user hidden"></user-info-form>
-    </div>
+    <label for="user">User:</label>
+    <input type="text" class="user" id="user" name="user" placeholder="User id" title="If no user id is entered a new one will be generated for you."/>
+    <input type="button" class="user" id="createUser" name="createUser" value="New User"/>
+    <span class="user error hidden">User id is required. Please create one.</span>
+    <user-info-form class="user hidden"></user-info-form>
 
     <p>
     The <a href="https://www.ebidlocal.com/">Ebidlocal</a> search is very limited. It does not allow any special characters or phrases (such as "cd player"). Therefore keywords you enter here should be single words.
@@ -25,18 +23,16 @@
     <!-- Keyword List -->
     <span class="keywordlist error hidden">Invalid keyword</span>
     <input type="hidden" id="list" name="list" value=""/>
-    <ol   class="keyword" id="watchlistList"></ol>
+    <ul   class="keyword" id="watchlistList"></ul>
 
     <hr/>
 
     <input type="submit" value="Submit"/>
     <input type="button" id="clear" name="clear" value="Clear"/>
     <span class="submit error hidden">Failed to create watchlist.</span>
-    <ul class="submit" id="createdWatchlists"></ul>
+    <ul class="submit" id="createdWatchlists">
+    </ul>
     <template id="watchlistCreatedTemplate">
         <li class="submit success">Watch list created <a href="{{url}}">{{watchlistName}}</a></li>
-    </template>
-    <template id="watchlistEditedTemplate">
-        <li class="submit success">Watch list updated <a href="{{url}}">{{watchlistName}}</a></li>
     </template>
 </form>

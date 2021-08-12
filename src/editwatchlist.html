@@ -6,12 +6,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <meta name="theme-color" content="#000000"/>
 
-        <title>View Ebidlocal Watch list</title>
+        <title>Edit Ebidlocal Watch list</title>
 
         <link rel="stylesheet" href="css/main.css"/>
         <link rel="icon" href="img/favicon.ico"/>
         <link rel="apple-touch-icon-precomposed" href="img/icon-32.png"/>
 
+        <script src="https://kit.fontawesome.com/05b75b3316.js" crossorigin="anonymous"></script>
         <noscript>
            <style>
                .noscript {
@@ -21,7 +22,7 @@
         </noscript>
 
         <script src="js/vendor/debug.js"></script>
-        <script type="module" src="modules/watchlists.js" defer></script>
+        <script type="module" src="modules/editwatchlist.js"></script>
     </head>
     <body>
         <noscript>
@@ -34,8 +35,11 @@
             </ul>
         </nav>
 
-        <section>
-            <tab-view id="userWatchlist"></tab-view>
+        <section class="noscript list-watchlists">
+            <list-watchlists></list-watchlists>
+        </section>
+        <section class="noscript edit-watchlist">
+            <add-watchlist-form data-hide-user-form></add-watchlist-form>
         </section>
     </body>
 </html>

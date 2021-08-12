@@ -1,8 +1,9 @@
 import {default as createLogger} from '../../modules/logFactory.js';
 
-import '../components/ViewWatchlists-Depricated/main.js';
 import '../components/TabView/main.js';
 import '../../modules/extras-location.js';
+import '../../modules/extras-css.js';
+import {requestUserWatchlists} from '../../modules/apiUtils.js';
 
 (()=>{
     const logger = createLogger('watchlists.js'),
@@ -14,24 +15,26 @@ import '../../modules/extras-location.js';
         Array.prototype.slice.call(document.querySelectorAll('li a')).forEach(elem=> {
             elem.href = elem.href + '?id=' + encodeURIComponent(userId);
         });
-        requestWatchlist(`/api/user/${userId}/data.json`).then(addWatchListToTabView);
-    }
+        requestUserWatchlists(userId).then(addWatchListToTabView).then((elems)=>{
+            let button = elems[0].button,
+                tabId = window.decodeURIComponent(window.location.hash);
 
-    /*
-     * Expected Response:
-     *   {
-     *      "watchlists": {
-     *        "wine list":"9XcsXa1ZWvItsdXtK2gmFpgkbcY=",
-     *        "wine list4":"9XcsXa1ZWvItsdXtK2gmFpgkbcY="
-     *       }
-     *    }
-    */
-    function requestWatchlist(url) {
-        return fetch(url, {
-            method:   'GET',
-            redirect: 'follow'
-        }).then(response=>response.json())
-            .then(data=>data.watchlists);
+            try{
+                tabId = tabId.escapeForCSS();
+            }catch{
+                tabId = '';
+            }
+
+            if(tabId) {
+                button = document.querySelector(`tab-view #${tabId}`);
+            }
+
+            if(button) {
+                setTimeout(()=>{
+                    button.click();
+                }, 10);
+            }
+        });
     }
 
     function addWatchListToTabView(watchlists) {
@@ -39,8 +42,8 @@ import '../../modules/extras-location.js';
 
         for(let listName in watchlists) {
             let watchlistId = watchlists[listName],
-                tabId = watchlistId.replace('=', ''),
-                panelId = tabId + '-panel',
+                tabId = watchlistId.escapeForCSS(),
+                panelId = 'panel-' + tabId,
                 div = document.createElement('div');
 
             div.innerHTML = `<button slot="tab-bar" is="tab-bar-button" id="${tabId}" role="tab" aria-selected="false" aria-controls="${panelId}">${listName}</button>
@@ -57,8 +60,6 @@ import '../../modules/extras-location.js';
             watchlistElem.appendChild(o.button);
             watchlistElem.appendChild(o.tabPanel);
         });
-
-        if(elems.length) elems[0].button.click();
 
         return elems;
     }

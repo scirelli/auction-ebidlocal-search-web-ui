@@ -1,0 +1,49 @@
+button {
+    font-size:12px
+}
+
+.fa, .far, .fas {
+    font-family: "Font Awesome 5 Free";
+}
+.fa, .fas, .far {
+    font-weight: 900;
+    font-size:12px
+}
+.fa-file-alt:before {
+    content: "\f15c";
+}
+.fa-edit:before {
+    content: "\f044";
+}
+.fa-trash-alt:before {
+    content: "\f2ed";
+}
+.fa, .fab, .fad, .fal, .far, .fas {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+}
+
+.list span {
+    display: inline-block;
+}
+.list .item:after {
+    content: ",";
+    margin-right: 1em;
+}
+.list .item:last-child:after {
+    content: "";
+}
+
+.controls {
+}
+.list-name {
+    text-align: left;
+}
+
+.list {
+}

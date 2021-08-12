@@ -31,11 +31,3 @@ label {
 #watchlistName {
     display:block;
 }
-
-#watchlistList li::marker {
-    content: none;
-}
-
-#watchlistList li button > span {
-    font-weight: bold;
-}
