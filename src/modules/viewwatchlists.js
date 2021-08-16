@@ -17,16 +17,10 @@ import {requestUserWatchlists} from '../../modules/apiUtils.js';
         });
         requestUserWatchlists(userId).then(addWatchListToTabView).then((elems)=>{
             let button = elems[0].button,
-                tabId = window.decodeURIComponent(window.location.hash);
-
-            try{
-                tabId = tabId.escapeForCSS();
-            }catch{
-                tabId = '';
-            }
+                tabId = window.location.hash;
 
             if(tabId) {
-                button = document.querySelector(`tab-view #${tabId}`);
+                button = document.querySelector(`tab-view ${tabId}`);
             }
 
             if(button) {
@@ -42,7 +36,7 @@ import {requestUserWatchlists} from '../../modules/apiUtils.js';
 
         for(let listName in watchlists) {
             let watchlistId = watchlists[listName],
-                tabId = watchlistId.escapeForCSS(),
+                tabId = _generateWatchlistRowId(watchlistId, listName),
                 panelId = 'panel-' + tabId,
                 div = document.createElement('div');
 
@@ -62,5 +56,9 @@ import {requestUserWatchlists} from '../../modules/apiUtils.js';
         });
 
         return elems;
+    }
+
+    function _generateWatchlistRowId(listId, listName) {
+        return `${listName}_${listId}`.escapeForCSS();
     }
 })();

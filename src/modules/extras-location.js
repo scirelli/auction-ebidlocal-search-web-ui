@@ -8,8 +8,8 @@ function queryStrToObj(str) {
     var obj = new Object();
     for(let i=0; i<str.length; i++) {
         let [key, value] = str[i].split('=');
-        value = value ? unescape(value) : null;
-        key = unescape(key);
+        value = value ? decodeURIComponent(value) : null;
+        key = decodeURIComponent(key);
         if(key in obj) {
             obj[key] = [].concat(obj[key], value);
         }else{

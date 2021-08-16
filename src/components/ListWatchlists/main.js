@@ -59,46 +59,7 @@ customElements.define(TAG_NAME, class ListWatchlists extends HTMLElement{
     }
 
     _initDom() {
-        const rowTemplate = this.shadowRoot.querySelector('#template-row');
-        return this._requestWatchlists().then(lists => {
-            return lists.reduce((a, l)=>{
-                let {name, list, id} = l,
-                    row = rowTemplate.content.cloneNode(true),
-                    listElem = row.querySelector('.list'),
-                    span;
-
-                row.querySelector('tr').setAttribute('id', id.escapeForCSS());
-                Array.prototype.forEach.call(row.querySelectorAll('button'), elem => {
-                    elem.value = elem.value.mustache({
-                        watchlistId:    id,
-                        watchlistIdCSS: id.escapeForCSS(),
-                        userId:         this._getUserId(),
-                        userIdEncoded:  window.encodeURIComponent(this._getUserId()),
-                        watchlistName:  name
-                    });
-                    elem.setAttribute('data-row-id', row.querySelector('tr').id);
-                });
-
-                span = document.createElement('span');
-                span.innerText = name;
-                row.querySelector('.list-name').appendChild(span);
-
-                list.forEach(item => {
-                    span = document.createElement('span');
-                    span.classList.add('item');
-                    span.innerText = item;
-                    listElem.appendChild(span);
-                });
-
-                a.push(row);
-                return a;
-            }, []);
-        }).then(rows => {
-            rows.forEach(row => {
-                this.watchlistsContainerElem.querySelector('tbody').appendChild(row);
-            });
-            return rows;
-        }).catch(logger.error);
+        return this._buildTable();
     }
 
     _attachEventListeners() {
@@ -106,40 +67,129 @@ customElements.define(TAG_NAME, class ListWatchlists extends HTMLElement{
             elem.addEventListener('click', e => {
                 e.preventDefault();
                 e.stopPropagation();
-                window.location.href = elem.value;
-            });
-        });
-        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.delete-button'), elem => {
-            elem.addEventListener('click', e => {
-                e.preventDefault();
-                e.stopPropagation();
-                fetch(`/api/user/${this._getUserId()}/watchlist`, {
-                    method:  'DELETE',
-                    cache:   'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    redirect:       'follow',
-                    referrerPolicy: 'no-referrer',
-                    body:           JSON.stringify({name: e.currentTarget.value})
-                }).then(response => {
-                    logger.log(response.status);
-                    if(response.status === 204) {
-                        let row = this.shadowRoot.querySelector(`#${elem.getAttribute('data-row-id')}`);
-                        if(row) row.remove();
-                    }
-                }).catch(logger.error);
+                let watchlistId = elem.getAttribute('data-watchlist-id'),
+                    watchlistName = elem.value,
+                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+
+                window.location.href = `/viewwatchlists.html?id=${encodeURIComponent(this._getUserId())}#${rowId}`;
+                this.dispatchEvent(new CustomEvent('view-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
             });
         });
         Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.edit-button'), elem => {
             elem.addEventListener('click', e => {
                 e.preventDefault();
                 e.stopPropagation();
-                window.location.removeSearch('watchlistId');
-                window.location.pushSearch('watchlistId', e.currentTarget.value);
-                this.dispatchEvent(new CustomEvent('edit-watchlist-click', {bubbles: true, detail: {watchlistId: e.currentTarget.value}}));
+                let watchlistId = elem.getAttribute('data-watchlist-id'),
+                    watchlistName = elem.value,
+                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+
+                this.dispatchEvent(new CustomEvent('edit-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
             });
         });
+        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.delete-button'), elem => {
+            elem.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                let watchlistId = elem.getAttribute('data-watchlist-id'),
+                    watchlistName = elem.value,
+                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+
+                this.dispatchEvent(new CustomEvent('delete-watchlist-click', {bubbles: true, detail: {name: watchlistName, id: watchlistId, rowId: rowId}}));
+            });
+        });
+
+        document.body.addEventListener('watchlist-change', e => {
+            logger.debug(e.detail);
+            //There was a change make sure lists match
+            return this._requestWatchlists().then(lists => {
+                let watchlistId = e.detail.id,
+                    watchlistName = e.detail.name,
+                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+
+                //Id's are unique per-watch-list so we have to use the name which doesn't change during a list edit.
+                //If the name does change it's considered a new watch list not an edited list. The user has to manually delete the old list.
+                //If the change was a delete, the list will be empty because it on longer exists on the server.
+                lists = lists.filter(watchlistInfo => {
+                    return watchlistName && watchlistInfo.name && watchlistName === watchlistInfo.name;
+                });
+
+                if(!lists.length) {
+                    let row = this.shadowRoot.querySelector(`#${rowId}`);
+                    if(row) row.remove();
+                } else {
+                    const tbody = this.watchlistsContainerElem.querySelector('tbody');
+                    if(e.detail.oldWatchlistName && e.detail.oldWatchlistId) {
+                        let row = this.shadowRoot.querySelector('#' + this._generateWatchlistRowId(e.detail.oldWatchlistId, e.detail.oldWatchlistName));
+                        if(row) row.remove();
+                    }
+                    lists.forEach(watchlistInfo => {
+                        tbody.appendChild(this._createListRowElem(watchlistInfo));
+                    });
+                }
+            }).catch(logger.error);
+        });
+    }
+
+    _buildTable() {
+        return this._requestWatchlists().then(lists => {
+            const tbody = this.watchlistsContainerElem.querySelector('tbody');
+            return lists.forEach(watchlistInfo=>{
+                tbody.appendChild(this._createListRowElem(watchlistInfo));
+            });
+        }).catch(logger.error);
+    }
+
+    _createListRowElem(watchlistInfo) {
+        const rowTemplate = this.shadowRoot.querySelector('#template-row');
+        let {name, list, id} = watchlistInfo,
+            row = rowTemplate.content.cloneNode(true),
+            rowId = this._generateWatchlistRowId(id, name),
+            listElem = row.querySelector('.list'),
+            data = {
+                watchlistId:      id,
+                rowId:            rowId,
+                userId:           this._getUserId(),
+                userIdURIEncoded: window.encodeURIComponent(this._getUserId()),
+                watchlistName:    name
+            };
+
+        row.querySelector('tr').setAttribute('id', rowId);
+        Array.prototype.forEach.call(row.querySelectorAll('button'), elem => {
+            elem.getAttributeNames().forEach(attr => {
+                elem.setAttribute(attr, elem.getAttribute(attr).mustache(data));
+            });
+        });
+
+        row.querySelector('.list-name').appendChild(this._buildListNameElement(name));
+        this._buildListItemElements(list).forEach(item => {
+            listElem.appendChild(item);
+        });
+        return row;
+    }
+
+    _buildListNameElement(name) {
+        let span = document.createElement('span');
+        span.innerText = name;
+        return span;
+    }
+
+    _buildListItemElements(list) {
+        return list.map(item => {
+            let span = document.createElement('span');
+            span.classList.add('item');
+            span.innerText = item;
+            return span;
+        });
+    }
+
+    _clearTable() {
+        this.shadowRoot.querySelector('#list-watchlists-container table tbody').innerHTML = '';
+    }
+
+    _resetContent() {
+        this._clearTable();
+        this._buildTable();
     }
 
     _setUserId(id) {
@@ -168,6 +218,10 @@ customElements.define(TAG_NAME, class ListWatchlists extends HTMLElement{
                     return lists.filter(l=>l.status).map(l=>l.value);
                 });
             });
+    }
+
+    _generateWatchlistRowId(listId, listName) {
+        return `${listName}_${listId}`.escapeForCSS();
     }
 
     static __registerElement() {

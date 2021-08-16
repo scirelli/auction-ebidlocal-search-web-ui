@@ -9,13 +9,13 @@
 <template id="template-row">
     <tr>
         <th class="controls">
-            <button class="view-button" value="/viewwatchlists.html?id={{userIdEncoded}}#{{watchlistIdCSS}}">View <i class="fas fa-file-alt" aria-hidden="true"></i></button>
+            <button class="view-button" value="{{watchlistName}}" data-watchlist-id="{{watchlistId}}" data-row-id="{{rowId}}">View <i class="fas fa-file-alt" aria-hidden="true"></i></button>
         </th>
         <th class="controls">
-            <button class="edit-button" value="{{watchlistId}}">Edit <i class="fas fa-edit" aria-hidden="true"></i></button>
+            <button class="edit-button" value="{{watchlistName}}" data-watchlist-id="{{watchlistId}}" data-row-id="{{rowId}}">Edit <i class="fas fa-edit" aria-hidden="true"></i></button>
         </th>
         <th class="controls">
-            <button class="delete-button" value="{{watchlistName}}" data-row-id="{{watchlistId}}">Delete <i class="far fa-trash-alt" aria-hidden="true"></i></button>
+            <button class="delete-button" value="{{watchlistName}}" data-watchlist-id="{{watchlistId}}" data-row-id="{{rowId}}">Delete <i class="far fa-trash-alt" aria-hidden="true"></i></button>
         </th>
         <th class="list-name"></th>
         <td class="list"></td>
