@@ -6,7 +6,7 @@ import './extras-location.js';
 (()=> {
     const logger = createLogger('WatchlistForm');
     const userId = window.location.searchObj.id,
-        watchlistId = window.location.searchObj.watchlistId,
+        watchlistName = window.location.searchObj.watchlistName,
         addWatchlistElem = document.body.querySelector('add-watchlist-form'),
         listWatchlistsElem = document.body.querySelector('list-watchlists');
 
@@ -20,8 +20,8 @@ import './extras-location.js';
         if(userId) {
             addWatchlistElem.setAttribute('data-user-id', userId);
         }
-        if(watchlistId) {
-            addWatchlistElem.setAttribute('data-edit', decodeURIComponent(watchlistId));
+        if(watchlistName) {
+            addWatchlistElem.setAttribute('data-edit', watchlistName);
         }
     }
 
@@ -34,7 +34,31 @@ import './extras-location.js';
         });
 
         listWatchlistsElem.addEventListener('edit-watchlist-click', function(e) {
-            addWatchlistElem.setAttribute('data-edit', e.detail.watchlistId);
+            addWatchlistElem.setAttribute('data-edit', e.detail.name);
+        }, false);
+
+        listWatchlistsElem.addEventListener('delete-watchlist-click', function(e) {
+            fetch(`/api/user/${this._getUserId()}/watchlist`, {
+                method:  'DELETE',
+                cache:   'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect:       'follow',
+                referrerPolicy: 'no-referrer',
+                body:           JSON.stringify({name: e.detail.name})
+            }).then(response => {
+                logger.log(response.status);
+                if(response.status === 204) {
+                    this.dispatchEvent(new CustomEvent('watchlist-deleted', {bubbles: true, detail: {name: e.detail.name, id: e.detail.id}}));
+                    this.dispatchEvent(new CustomEvent('watchlist-change', {bubbles: true, detail: {name: e.detail.name, id: e.detail.id, type: 'delete'}}));
+                }
+            }).catch(logger.error);
         }, false);
     }
+
+    document.body.addEventListener('watchlist-change', e => {
+        window.location.removeSearch('watchlistName');
+        window.location.pushSearch('watchlistName', e.detail.name);
+    });
 })();

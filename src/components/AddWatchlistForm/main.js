@@ -41,6 +41,7 @@ class WatchlistForm extends HTMLElement{
 
         this.attachShadow({mode: 'open'});
         this._loaded = false;
+        this._editing = null;
         this._promiseOfContent = Promise.allSettled([
             fetchHtmlElements(['/components/AddWatchlistForm/form.partial.html']).then(elems => this.shadowRoot.append(...elems)),
             fetchStyleElements(['/components/AddWatchlistForm/main.css']).then(elems => this.shadowRoot.append(...elems))
@@ -66,7 +67,7 @@ class WatchlistForm extends HTMLElement{
         switch(name) {
             case 'data-edit':
             case 'edit':
-                this._editWatchlist(newValue);
+                this._editing = this._editWatchlist(newValue);
                 break;
             case 'data-user-id':
             case 'user-id':
@@ -221,13 +222,17 @@ class WatchlistForm extends HTMLElement{
         })
             .then(response=>response.json())
             .then((responseData)=>{
-                if(this.getAttribute('data-edit') || this.getAttribute('edit')) {
+                if(this._editing) {
                     this._displayEditedWatchlist(data.name, responseData.watchlistID);
-                    window.location.removeSearch('watchlistId');
-                    window.location.addSearch('watchlistId', responseData.watchlistID);
-                    this.setAttribute('data-edit', responseData.watchlistID);
+                    this._editing.then(wl=> {
+                        this.dispatchEvent(new CustomEvent('watchlist-change', {bubbles: true, detail: {name: data.name, id: responseData.watchlistID, oldWatchlistName: wl.name, oldWatchlistId: wl.id, type: 'edit'}}));
+                    }).then(()=>{
+                        this._editing = null;
+                    });
+                    this.setAttribute('data-edit', data.name);
                 }else{
                     this._displayNewWatchlist(data.name, responseData.watchlistID);
+                    this.dispatchEvent(new CustomEvent('watchlist-change', {bubbles: true, detail: {name: data.name, id: responseData.watchlistID, type: 'new'}}));
                 }
             })
             .catch(e=>{
@@ -316,11 +321,12 @@ class WatchlistForm extends HTMLElement{
     }
 
     _editWatchlist(listId) {
-        this._requestWatchlist(listId).then(list=> {
+        return this._requestWatchlist(listId).then(list=> {
             logger.info(list);
             this._clearForm();
             this.watchlistNameElem.value = list.name;
             list.items.sort().forEach(this._addKeyWord.bind(this));
+            return list;
         }).catch(e=>{
             logger.error(e);
         });
