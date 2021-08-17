@@ -75,17 +75,7 @@ customElements.define(TAG_NAME, class ListWatchlists extends HTMLElement{
                 this.dispatchEvent(new CustomEvent('view-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
             });
         });
-        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.edit-button'), elem => {
-            elem.addEventListener('click', e => {
-                e.preventDefault();
-                e.stopPropagation();
-                let watchlistId = elem.getAttribute('data-watchlist-id'),
-                    watchlistName = elem.value,
-                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
-
-                this.dispatchEvent(new CustomEvent('edit-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
-            });
-        });
+        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.edit-button'), this._addEditEventListener.bind(this));
         Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.delete-button'), elem => {
             elem.addEventListener('click', e => {
                 e.preventDefault();
@@ -124,11 +114,26 @@ customElements.define(TAG_NAME, class ListWatchlists extends HTMLElement{
                         if(row) row.remove();
                     }
                     lists.forEach(watchlistInfo => {
-                        tbody.appendChild(this._createListRowElem(watchlistInfo));
+                        let frag = this._createListRowElem(watchlistInfo);
+                        this._addEditEventListener(frag.querySelector('.edit-button'));
+                        tbody.appendChild(frag);
                     });
                 }
             }).catch(logger.error);
         });
+    }
+
+    _addEditEventListener(button) {
+        button.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            let watchlistId = button.getAttribute('data-watchlist-id'),
+                watchlistName = button.value,
+                rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+
+            this.dispatchEvent(new CustomEvent('edit-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
+        });
+        return button;
     }
 
     _buildTable() {

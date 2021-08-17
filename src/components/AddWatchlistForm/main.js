@@ -379,7 +379,7 @@ class WatchlistForm extends HTMLElement{
         button.value = keyword;
         button.innerHTML = `<span title="Delete keyword">x</span> ${keyword}`;
         button.addEventListener('click', ()=>{
-            button.remove();
+            li.remove();
         });
         this.watchlistElem.appendChild(li);
     }
