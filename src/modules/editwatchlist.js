@@ -35,6 +35,8 @@ import './extras-location.js';
 
         listWatchlistsElem.addEventListener('edit-watchlist-click', function(e) {
             addWatchlistElem.setAttribute('data-edit', e.detail.name);
+            window.location.removeSearch('watchlistName');
+            window.location.pushSearch('watchlistName', e.detail.name);
         }, false);
 
         listWatchlistsElem.addEventListener('delete-watchlist-click', function(e) {
@@ -56,9 +58,4 @@ import './extras-location.js';
             }).catch(logger.error);
         }, false);
     }
-
-    document.body.addEventListener('watchlist-change', e => {
-        window.location.removeSearch('watchlistName');
-        window.location.pushSearch('watchlistName', e.detail.name);
-    });
 })();
