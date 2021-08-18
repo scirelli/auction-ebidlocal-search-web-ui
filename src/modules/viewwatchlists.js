@@ -4,10 +4,12 @@ import '../components/TabView/main.js';
 import '../../modules/extras-location.js';
 import '../../modules/extras-css.js';
 import {requestUserWatchlists} from '../../modules/apiUtils.js';
+import {getUserId} from './extras-cookies.js';
+import './requireUserId.js';
 
 (()=>{
     const logger = createLogger('watchlists.js'),
-        userId = window.location.searchObj.id,
+        userId = getUserId(),
         watchlistElem = document.body.querySelector('tab-view');
 
     if(userId) {
@@ -28,7 +30,7 @@ import {requestUserWatchlists} from '../../modules/apiUtils.js';
                     button.click();
                 }, 10);
             }
-        });
+        }).catch(logger.error);
     }
 
     function addWatchListToTabView(watchlists) {

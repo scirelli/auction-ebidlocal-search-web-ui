@@ -11,7 +11,11 @@ function requestUserWatchlists(userId) {
     return fetch(`/api/user/${userId}/data.json`, {
         method:   'GET',
         redirect: 'follow'
-    }).then(response=>response.json())
+    }).then(response=>{
+        if(!response.ok) throw new Error('Request failed.', {cause: response});
+        return response;
+    })
+        .then(response=>response.json())
         .then(data=>data.watchlists);
 }
 
@@ -19,7 +23,10 @@ function requestWatchlist(listId) {
     return fetch(`api/watchlist/${listId}/data.json`, {
         method:   'GET',
         redirect: 'follow'
+    }).then(response=>{
+        if(!response.ok) throw new Error('Request failed.', {cause: response});
+        return response;
     }).then(response=>response.json());
 }
 
-export { requestUserWatchlists, requestWatchlist };
+export { requestUserWatchlists, requestWatchlist};

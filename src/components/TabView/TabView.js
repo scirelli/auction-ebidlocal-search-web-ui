@@ -93,7 +93,7 @@ customElements.define(TAG_NAME, class TabView extends HTMLElement{
     }
 
     _activateTabFromLocationHash() {
-        let tabElem = this.querySelector(`${window.location.hash}`);
+        let tabElem = this.querySelector(`${window.location.hash || '#undefined'}`);
         if(tabElem) {
             this._activateTab(tabElem, this.querySelector(`#${tabElem.getAttribute('aria-controls')}`));
         }
