@@ -1,8 +1,10 @@
 import {default as createLogger} from './logFactory.js';
 import './extras-location.js';
+import {getUserId} from './extras-cookies.js';
+import './requireUserId.js';
 
 (()=> {
-    const userId = window.location.searchObj.id,
+    const userId = getUserId(),
         logger = createLogger('index.js');
 
     if(userId) {

@@ -2,10 +2,12 @@ import {default as createLogger} from '../../modules/logFactory.js';
 import '../components/AddWatchlistForm/main.js';
 import '../components/ListWatchlists/main.js';
 import './extras-location.js';
+import {getUserId} from './extras-cookies.js';
+import './requireUserId.js';
 
 (()=> {
     const logger = createLogger('WatchlistForm');
-    const userId = window.location.searchObj.id,
+    const userId = getUserId(),
         watchlistName = window.location.searchObj.watchlistName,
         addWatchlistElem = document.body.querySelector('add-watchlist-form'),
         listWatchlistsElem = document.body.querySelector('list-watchlists');

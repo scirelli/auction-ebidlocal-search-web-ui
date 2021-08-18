@@ -1,8 +1,10 @@
 import '../components/AddWatchlistForm/main.js';
 import './extras-location.js';
+import {getUserId} from './extras-cookies.js';
+import './requireUserId.js';
 
 (()=> {
-    const userId = window.location.searchObj.id,
+    const userId = getUserId(),
         watchlistId = window.location.searchObj.watchlistId;
 
     if(userId) {

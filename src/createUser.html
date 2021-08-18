@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html class="no-js" lang="EN">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="description" content="Create a new user."/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="theme-color" content="#000000"/>
+
+        <title>Create User</title>
+
+        <link rel="stylesheet" href="css/main.css"/>
+        <link rel="icon" href="img/favicon.ico"/>
+        <link rel="apple-touch-icon-precomposed" href="img/icon-32.png"/>
+
+        <noscript>
+           <style>
+               .noscript {
+                   display: none;
+               }
+           </style>
+        </noscript>
+
+        <script src="js/vendor/debug.js"></script>
+        <script type="module" src="modules/createUser.js"></script>
+    </head>
+    <body>
+        <noscript>
+            <h1>This page requires Javascript.</h1>
+        </noscript>
+
+        <nav aria-labelledby="primary-navigation">
+            <ul id="primary-navigation">
+                <li><a class="home" href="/" >Home</a></li>
+            </ul>
+        </nav>
+        <section class="noscript">
+            <span class="info-id-required">This site requires a user id to create watch lists. Please create one using this form, or enter the one you previously created.</span>
+            <user-info-form class="user hidden"></user-info-form>
+            <form id="confirm-form" name="confirm-form" method="GET" action="/">
+                <div>
+                    <label for="user-id">User id:</label>
+                    <input type="text" id="user-id" name="id" placeholder="Please create a user id."/>
+                    <span class="info-note-msg hidden">Please take note of your user id, it is the only way you will be able to retrieve your watch lists. Press <em>OK</em> when ready.</span>
+                    <span class="error hidden"></span>
+                </div>
+
+                <div>
+                    <input type="submit" value="OK" disabled/>
+                    <input type="button" id="create-btn" name="create-btn" value="Create" disabled/>
+                </div>
+            </form>
+        </section>
+    </body>
+</html>

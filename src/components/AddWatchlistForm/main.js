@@ -111,7 +111,7 @@ class WatchlistForm extends HTMLElement{
     _attachEventListeners() {
         this.addKeywordElem.addEventListener('click', (evt)=> {
             evt.preventDefault();
-            let keyword = this.keywordElem.value;
+            let keyword = this.keywordElem.value.trim();
             if(!this.isValidKeyword(keyword)) {
                 return this.displayInvalidKeywordError(keyword);
             }
@@ -220,6 +220,10 @@ class WatchlistForm extends HTMLElement{
             referrerPolicy: 'no-referrer',
             body:           JSON.stringify(data)
         })
+            .then(response=>{
+                if(!response.ok) throw new Error('Request Failed', {cause: response});
+                return response;
+            })
             .then(response=>response.json())
             .then((responseData)=>{
                 if(this._editing) {
@@ -254,7 +258,7 @@ class WatchlistForm extends HTMLElement{
         setTimeout(()=> {
             this.keywordErrorElem.classList.add('hidden');
             this.keywordElem.classList.remove('invalid');
-        }, this.MESSAGE_CLOSE_DEPLAY);
+        }, WatchlistForm.MESSAGE_CLOSE_DEPLAY);
     }
 
     displayInvalidWatchlistName(/*watchlistName*/) {
@@ -263,7 +267,7 @@ class WatchlistForm extends HTMLElement{
         setTimeout(()=> {
             this.watchlistNameErrorElem.classList.add('hidden');
             this.watchlistNameElem.classList.remove('invalid');
-        }, this.MESSAGE_CLOSE_DEPLAY);
+        }, WatchlistForm.MESSAGE_CLOSE_DEPLAY);
     }
 
     displayInvalidWatchlist(/*watchlist*/) {
