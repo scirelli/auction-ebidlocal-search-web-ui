@@ -25,7 +25,7 @@ function getCookie(cname) {
 }
 
 function getUserId() {
-    return Cookies.get('id') || window.location.searchObj.id || null;
+    return window.location.searchObj.id || Cookies.get('id') || null;
 }
 
 export {setCookie, getCookie, getUserId};
