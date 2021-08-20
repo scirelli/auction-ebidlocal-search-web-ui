@@ -63,62 +63,45 @@ customElements.define(TAG_NAME, class ListWatchlists extends HTMLElement{
     }
 
     _attachEventListeners() {
-        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.view-button'), elem => {
-            elem.addEventListener('click', e => {
-                e.preventDefault();
-                e.stopPropagation();
-                let watchlistId = elem.getAttribute('data-watchlist-id'),
-                    watchlistName = elem.value,
-                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
-
-                window.location.href = `/viewwatchlists.html?id=${encodeURIComponent(this._getUserId())}#${rowId}`;
-                this.dispatchEvent(new CustomEvent('view-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
-            });
-        });
+        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.view-button'), this._addViewEventListener.bind(this));
         Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.edit-button'), this._addEditEventListener.bind(this));
-        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.delete-button'), elem => {
-            elem.addEventListener('click', e => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                let watchlistId = elem.getAttribute('data-watchlist-id'),
-                    watchlistName = elem.value,
-                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
-
-                this.dispatchEvent(new CustomEvent('delete-watchlist-click', {bubbles: true, detail: {name: watchlistName, id: watchlistId, rowId: rowId}}));
-            });
-        });
+        Array.prototype.forEach.call(this.shadowRoot.querySelectorAll('button.delete-button'), this._addDeleteEventListener.bind(this));
 
         document.body.addEventListener('watchlist-change', e => {
             logger.debug(e.detail);
             //There was a change make sure lists match
             return this._requestWatchlists().then(lists => {
-                let watchlistId = e.detail.id,
-                    watchlistName = e.detail.name,
-                    rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+                let diff = {add: [], remove: []},
+                    tbody = this.shadowRoot.querySelector('#list-watchlists-container table tbody'),
+                    currentElems = Array.prototype.reduce.call(this.shadowRoot.querySelectorAll('#list-watchlists-container table tbody tr'), (a, e)=>{
+                        a[e.id] = e;
+                        return a;
+                    }, {}),
+                    srcList = {};
 
-                //Id's are unique per-watch-list so we have to use the name which doesn't change during a list edit.
-                //If the name does change it's considered a new watch list not an edited list. The user has to manually delete the old list.
-                //If the change was a delete, the list will be empty because it on longer exists on the server.
-                lists = lists.filter(watchlistInfo => {
-                    return watchlistName && watchlistInfo.name && watchlistName === watchlistInfo.name;
+                lists.forEach(list => {
+                    list.rowId = this._generateWatchlistRowId(list.id, list.name);
+                    srcList[list.rowId] = list;
+
+                    if(!currentElems[list.rowId]) {
+                        diff.add.push(list);
+                    }
                 });
 
-                if(!lists.length) {
-                    let row = this.shadowRoot.querySelector(`#${rowId}`);
-                    if(row) row.remove();
-                } else {
-                    const tbody = this.watchlistsContainerElem.querySelector('tbody');
-                    if(e.detail.oldWatchlistName && e.detail.oldWatchlistId) {
-                        let row = this.shadowRoot.querySelector('#' + this._generateWatchlistRowId(e.detail.oldWatchlistId, e.detail.oldWatchlistName));
-                        if(row) row.remove();
+                for(let id in currentElems) {
+                    if(!srcList[id]) {
+                        diff.remove.push(currentElems[id]);
                     }
-                    lists.forEach(watchlistInfo => {
-                        let frag = this._createListRowElem(watchlistInfo);
-                        this._addEditEventListener(frag.querySelector('.edit-button'));
-                        tbody.appendChild(frag);
-                    });
                 }
+
+                diff.add.forEach(watchlistInfo=>{
+                    let frag = this._createListRowElem(watchlistInfo);
+                    this._addViewEventListener(frag.querySelector('button.view-button'));
+                    this._addEditEventListener(frag.querySelector('button.edit-button'));
+                    this._addDeleteEventListener(frag.querySelector('button.delete-button'));
+                    tbody.appendChild(frag);
+                });
+                diff.remove.forEach(e => e.remove());
             }).catch(logger.error);
         });
     }
@@ -132,6 +115,34 @@ customElements.define(TAG_NAME, class ListWatchlists extends HTMLElement{
                 rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
 
             this.dispatchEvent(new CustomEvent('edit-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
+        });
+        return button;
+    }
+
+    _addViewEventListener(button) {
+        button.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            let watchlistId = button.getAttribute('data-watchlist-id'),
+                watchlistName = button.value,
+                rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+
+            window.location.href = `/viewwatchlists.html?id=${encodeURIComponent(this._getUserId())}#${rowId}`;
+            this.dispatchEvent(new CustomEvent('view-watchlist-click', {bubbles: true, detail: {id: watchlistId, name: watchlistName, rowId: rowId}}));
+        });
+        return button;
+    }
+
+    _addDeleteEventListener(button) {
+        button.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let watchlistId = button.getAttribute('data-watchlist-id'),
+                watchlistName = button.value,
+                rowId = this._generateWatchlistRowId(watchlistId, watchlistName);
+
+            this.dispatchEvent(new CustomEvent('delete-watchlist-click', {bubbles: true, detail: {name: watchlistName, id: watchlistId, rowId: rowId}}));
         });
         return button;
     }
