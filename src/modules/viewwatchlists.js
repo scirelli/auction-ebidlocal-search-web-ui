@@ -46,6 +46,11 @@ import './requireUserId.js';
                  <section slot="tab-panel" is="tab-panel" id="${panelId}" role="tabpanel" aria-labelledby="${tabId}" tabindex="0" aria-hidden="false" class="hidden">
                     <iframe width="100%" height="100%" src="/api/user/${userId}/watchlist/${watchlistId}/index.html"></iframe>
                 </section>`;
+            div.querySelector('iframe').addEventListener('load', e => {
+                Array.prototype.forEach.call(e.target.contentDocument.body.querySelectorAll('a'), a => {
+                    a.target = '_blank';
+                });
+            });
             elems.push({
                 button:   div.querySelector('button'),
                 tabPanel: div.querySelector('section')
