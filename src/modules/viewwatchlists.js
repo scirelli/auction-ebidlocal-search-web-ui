@@ -44,11 +44,17 @@ import './requireUserId.js';
 
             div.innerHTML = `<button slot="tab-bar" is="tab-bar-button" id="${tabId}" role="tab" aria-selected="false" aria-controls="${panelId}">${listName}</button>
                  <section slot="tab-panel" is="tab-panel" id="${panelId}" role="tabpanel" aria-labelledby="${tabId}" tabindex="0" aria-hidden="false" class="hidden">
-                    <iframe width="100%" height="100%" src="/api/user/${userId}/watchlist/${watchlistId}/index.html"></iframe>
+                    <iframe width="100%" height="100%" src="/api/user/${userId}/watchlist/${watchlistId}/email.html"></iframe>
                 </section>`;
             div.querySelector('iframe').addEventListener('load', e => {
                 Array.prototype.forEach.call(e.target.contentDocument.body.querySelectorAll('a'), a => {
                     a.target = '_blank';
+                });
+                Array.prototype.forEach.call(e.target.contentDocument.body.querySelectorAll('.email-msg'), elem => {
+                    elem.classList.add('hidden');
+                });
+                Array.prototype.forEach.call(e.target.contentDocument.body.querySelectorAll('td.description'), elem => {
+                    elem.innerText = elem.innerText.trim().replace(/<[/]?.+?[/]?>/g, ' ');
                 });
             });
             elems.push({
