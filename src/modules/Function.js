@@ -13,7 +13,7 @@ if(!Function.prototype.delay) {
 }
 
 if(!Function.prototype.defer) {
-    Function.prototype.defer = function defer(thsPtr) {
+    Function.prototype.defer = function defer(/*thsPtr*/) {
         Array.prototype.splice.call(arguments, 1, 0, 0);
         return this.delay.apply(this, arguments);
     };

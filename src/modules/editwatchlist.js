@@ -1,6 +1,7 @@
 import {default as createLogger} from '../../modules/logFactory.js';
 import '../components/AddWatchlistForm/main.js';
 import '../components/ListWatchlists/main.js';
+import '../components/SearchKeyword/main.js';
 import './extras-location.js';
 import {getUserId} from './extras-cookies.js';
 import './requireUserId.js';
@@ -10,7 +11,8 @@ import './requireUserId.js';
     const userId = getUserId(),
         watchlistName = window.location.searchObj.watchlistName,
         addWatchlistElem = document.body.querySelector('add-watchlist-form'),
-        listWatchlistsElem = document.body.querySelector('list-watchlists');
+        listWatchlistsElem = document.body.querySelector('list-watchlists'),
+        searchKeywordElem = document.body.querySelector('search-keyword');
 
     if(userId) {
         Array.prototype.slice.call(document.querySelectorAll('a.home')).forEach(elem=> {
@@ -59,5 +61,19 @@ import './requireUserId.js';
                 }
             }).catch(logger.error);
         }, false);
+
+        document.body.addEventListener('keyword-added', function(e) {
+            let keywords = (searchKeywordElem.getAttribute('data-keywords') || '').split(',').filter(Boolean);
+            keywords.push(e.detail.keyword);
+            searchKeywordElem.setAttribute('data-keywords', keywords.join(','));
+        }, false);
+        document.body.addEventListener('keyword-removed', function(e) {
+            let keywords = (searchKeywordElem.getAttribute('data-keywords') || '').split(',').filter(Boolean),
+                keywordId = keywords.indexOf(e.detail.keyword);
+            if(keywordId >= 0) {
+                keywords.splice(keywordId, 1);
+                searchKeywordElem.setAttribute('data-keywords', keywords.join(','));
+            }
+        });
     }
 })();
