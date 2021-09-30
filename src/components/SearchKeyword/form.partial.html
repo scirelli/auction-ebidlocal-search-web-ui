@@ -1,0 +1,40 @@
+<style>@import "/components/SearchKeyword/main.css";</style>
+<div class="loader hidden">Loading...</div>
+<table id="data-table" class="center hidden">
+    <thead>
+        <tr>
+            <th align="center" class="keyword">Keyword</th>
+            <th align="center" class="item-name">Item Name</th>
+            <th align="center" class="item-id hidden">Item Id</th>
+            <th align="center" class="photo">Photo</th>
+            <th align="center" class="description">Description <sup class="info" title="Descriptions are taken as is from the Ebidlocal site.">i</sup></th>
+            <th align="center" class="current-bid-amount">Current Bid</th>
+        </tr>
+    </thead>
+</table>
+<template id="keyword-body-template">
+    <tbody>
+        <tr class="keyword">
+            <th rowspan="{{$keywordLength}}">{{$key}}</th>
+        </tr>
+    </tbody>
+</template>
+<template id="item-row-template">
+    <tr class="items">
+        <td class="item-name">
+            <a href="{{.ItemURL}}" target="_blank">{{.ItemName}}</a>
+        </td>
+        <td class="item-id hidden">
+            <a href="{{.ItemURL}}" target="_blank">{{.Id}}</a>
+        </td>
+        <td class="photo">
+            <a href="{{.ItemURL}}" target="_blank"><img src="{{.ImageURL}}"/></a>
+        </td>
+        <td class="description">
+            {{.Description}}
+        </td>
+        <td class="current-bid-amount">
+            {{.CurrentBidAmount}}
+        </td>
+    </tr>
+</template>

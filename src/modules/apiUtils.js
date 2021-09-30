@@ -29,4 +29,14 @@ function requestWatchlist(listId) {
     }).then(response=>response.json());
 }
 
-export { requestUserWatchlists, requestWatchlist};
+function requestKeyword(keyword) {
+    return fetch(`api/search/?q=${keyword}`, {
+        method:   'GET',
+        redirect: 'follow'
+    }).then(response=>{
+        if(!response.ok) throw new Error('Request failed.', {cause: response});
+        return response;
+    }).then(response=>response.json()).then(result=>{return Array.isArray(result) ? result : [];});
+}
+
+export { requestUserWatchlists, requestWatchlist, requestKeyword};

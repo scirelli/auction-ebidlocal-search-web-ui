@@ -4,6 +4,7 @@ import '../UserInfoForm/main.js';
 import '../../modules/extras-location.js';
 import '../../modules/extras-css.js';
 import '../../modules/String.js';
+import '../../modules/Function.js';
 import {requestUserWatchlists, requestWatchlist} from '../../modules/apiUtils.js';
 
 const logger = createLogger('WatchlistForm');
@@ -370,7 +371,9 @@ class WatchlistForm extends HTMLElement{
     _clearForm() {
         this.watchlistNameElem.value = '';
         this.keywordElem.value = '';
-        this.watchlistElem.innerHTML = '';
+        Array.prototype.forEach.call(this.watchlistElem.querySelectorAll('button'), e=>{
+            e.click();
+        });
         this.watchlistNameElem.focus();
     }
 
@@ -384,8 +387,10 @@ class WatchlistForm extends HTMLElement{
         button.innerHTML = `<span title="Delete keyword">x</span> ${keyword}`;
         button.addEventListener('click', ()=>{
             li.remove();
+            this.dispatchEvent(new CustomEvent('keyword-removed', {bubbles: true, detail: {keyword: keyword}}));
         });
         this.watchlistElem.appendChild(li);
+        this.dispatchEvent(new CustomEvent('keyword-added', {bubbles: true, detail: {keyword: keyword}}));
     }
 
     _sortKeywords() {
