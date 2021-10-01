@@ -1,0 +1,36 @@
+<style>@import "/components/SearchKeyword-Accordion/main.css";</style>
+
+<template id="accordion-template">
+    <section>
+        <button id="{{.Keyword}}" class="accordion">{{.Keyword}} <span class="loader hidden icon">Loading...</span></button>
+        <div class="panel"></div>
+    </section>
+</template>
+
+<template id="panel-item">
+    <div class="container-row">
+        <div class="item-image">
+            <a href="{{.ItemURL}}" target="_blank">
+                <img src="{{.ImageURL}}" alt="{{.ItemName}}"/>
+            </a>
+        </div>
+        <div class="item-info container-row">
+            <h4 class="item">
+                <a href="{{.ItemURL}}" target="_blank">{{.ItemName}}</a>
+            </h4>
+            <div class="item item-description">
+                <!--<div class="category-info">
+                    <h5>Category</h5>
+                    <span>{{.Category}}</span>
+                </div>-->
+                <div class="product-desc">
+                    <span>{{.Description}}</span>
+                </div>
+                <div class="current-bid">
+                    <h5>Current Bid</h5>
+                    <span>{{.CurrentBidAmount}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
