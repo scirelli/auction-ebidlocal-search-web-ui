@@ -384,7 +384,7 @@ class WatchlistForm extends HTMLElement{
         li.classList.add('list-item');
         button.type = 'button';
         button.value = keyword;
-        button.innerHTML = `<span title="Delete keyword">x</span> ${keyword}`;
+        button.innerHTML = `<span title="Delete keyword" class="icon delete">x</span> <span class="keyword">${keyword}</span>`;
         button.addEventListener('click', ()=>{
             li.remove();
             this.dispatchEvent(new CustomEvent('keyword-removed', {bubbles: true, detail: {keyword: keyword}}));
