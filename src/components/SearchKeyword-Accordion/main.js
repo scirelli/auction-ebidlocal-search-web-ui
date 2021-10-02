@@ -67,6 +67,13 @@ customElements.define(TAG_NAME, class SearchKeyword extends HTMLElement{
     }
 
     _attachEventListeners() {
+        this.addEventListener('scroll-to-keyword', e => {
+            this.shadowRoot.getElementById(e.detail.keyword).scrollIntoView();
+        });
+        window.addEventListener('hashchange', ()=> {
+            let elem = this.shadowRoot.querySelector(`a${location.hash}`);
+            if(elem) elem.scrollIntoView();
+        }, false);
     }
 
     async _keywordAttributeChanged(newValue) {
@@ -147,7 +154,8 @@ customElements.define(TAG_NAME, class SearchKeyword extends HTMLElement{
 
         content.setAttribute('data-keyword', keyword);
         content.innerHTML = content.innerHTML.mustache({
-            '.Keyword': keyword
+            '.Keyword':       keyword,
+            '.KeywordLength': keywordModels.length
         });
         panel = content.querySelector('.panel');
 
@@ -201,24 +209,27 @@ customElements.define(TAG_NAME, class SearchKeyword extends HTMLElement{
 });
 
 async function findUnbrokenImage(imgElem, iter, defaultUrl) {
-    return new Promise((resolve, reject)=>{
-        if(Array.isArray(iter)) iter = iter[Symbol.iterator]();
-        if(!iter.next) return reject(new Error('Not iterable!'));
+    if(Array.isArray(iter)) iter = iter[Symbol.iterator]();
+    if(!iter.next) throw new Error('Not iterable!');
 
+    return new Promise((resolve)=>{
         let {value, done} = iter.next();
 
         if(done) {
+            imgElem.onerror = null;
+            imgElem.onload = null;
             imgElem.src = defaultUrl;
             return resolve(defaultUrl);
         }
 
         imgElem.src = value;
-        imgElem.addEventListener('load', ()=>{
+        imgElem.onload = ()=> {
             resolve(value);
-        });
-        imgElem.addEventListener('error', ()=>{
+        };
+        imgElem.onerror = ()=> {
             resolve(findUnbrokenImage(imgElem, iter, defaultUrl));
-        });
+        };
+
     });
 }
 

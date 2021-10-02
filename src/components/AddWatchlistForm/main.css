@@ -41,23 +41,38 @@ label {
     min-width:100px;
     margin: 1px 2px 1px 2px;
 }
-#watchlistList li.list-item button {
+#watchlistList li.list-item div {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
     align-content: center;
-}
-#watchlistList li button {
     width:100%;
 }
 
-#watchlistList li button > span.icon {
+#watchlistList li.list-item button .icon {
     font-weight: bold;
 }
-#watchlistList li button > span.keyword {
+#watchlistList li.list-item button.delete {
+    order: 0;
+    flex: 0 1;
+    text-transform: capitalize;
+    border-radius: 2px 0px 0px 2px;
+    border: 1px solid rgb(118, 118, 118);
+}
+
+#watchlistList li.list-item button.delete:hover {
+    background-image: linear-gradient(rgb(239, 239, 239), rgb(210, 210, 210) 100%);
+}
+
+#watchlistList li.list-item button.keyword:hover {
+    background-image: linear-gradient(rgb(239, 239, 239), rgb(210, 210, 210) 100%);
+}
+#watchlistList li.list-item button.keyword {
     order: 0;
     flex: 1;
     text-transform: capitalize;
+    border-radius: 0px 2px 2px 0px;
+    border: 1px solid rgb(118, 118, 118);
 }

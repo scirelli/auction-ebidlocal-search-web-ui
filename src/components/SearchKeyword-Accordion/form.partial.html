@@ -2,7 +2,8 @@
 
 <template id="accordion-template">
     <section>
-        <button id="{{.Keyword}}" class="accordion">{{.Keyword}} <span class="loader hidden icon">Loading...</span></button>
+        <a id="{{.Keyword}}" name="{{.Keyword}}"></a>
+        <button class="accordion">{{.Keyword}} ({{.KeywordLength}})<span class="loader hidden icon">Loading...</span></button>
         <div class="panel"></div>
     </section>
 </template>

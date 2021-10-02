@@ -99,7 +99,9 @@ sup.info {
   transition: 0.4s;
   text-transform: capitalize;
 }
-
+section {
+    margin: 1px;
+}
 .active, .accordion:hover {
   background-color: #ccc;
 }

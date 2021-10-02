@@ -378,17 +378,24 @@ class WatchlistForm extends HTMLElement{
     }
 
     _addKeyWord(keyword) {
-        let li = document.createElement('li'),
-            button = document.createElement('button');
-        li.appendChild(button);
-        li.classList.add('list-item');
-        button.type = 'button';
-        button.value = keyword;
-        button.innerHTML = `<span title="Delete keyword" class="icon delete">x</span> <span class="keyword">${keyword}</span>`;
-        button.addEventListener('click', ()=>{
+        let templateFrag = this.shadowRoot.querySelector('#keyword-template').content.cloneNode(true),
+            li = templateFrag.firstElementChild,
+            deleteButton, keywordButton;
+
+        li.innerHTML = li.innerHTML.mustache({
+            '.Keyword': keyword
+        });
+        deleteButton = li.querySelector('button.delete'),
+        keywordButton = li.querySelector('button.keyword');
+
+        deleteButton.addEventListener('click', ()=>{
             li.remove();
             this.dispatchEvent(new CustomEvent('keyword-removed', {bubbles: true, detail: {keyword: keyword}}));
         });
+        keywordButton.addEventListener('click', ()=>{
+            window.location.hash = '#' + keywordButton.value;
+        });
+
         this.watchlistElem.appendChild(li);
         this.dispatchEvent(new CustomEvent('keyword-added', {bubbles: true, detail: {keyword: keyword}}));
     }
