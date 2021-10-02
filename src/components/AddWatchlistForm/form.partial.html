@@ -39,4 +39,16 @@
     <template id="watchlistEditedTemplate">
         <li class="submit success">Watch list updated <a href="{{url}}">{{watchlistName}}</a></li>
     </template>
+    <template id="keyword-template">
+        <li class="list-item">
+            <div>
+                <button type="button" value="{{.Keyword}}" class="delete">
+                    <span title="Delete keyword" class="icon delete">x</span>
+                </button>
+                <button class="keyword" value="{{.Keyword}}">
+                    <span title="Link to keyword" class="keyword">{{.Keyword}}</span>
+                </button>
+            </div>
+        </li>
+    </template>
 </form>
