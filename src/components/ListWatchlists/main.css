@@ -1,3 +1,13 @@
+table {
+    border-collapse: separate;
+    border-spacing: 4px 10px;
+}
+@media only screen and (max-width: 400px) {
+    table {
+        border-spacing: 4px 20px;
+    }
+}
+
 button {
     font-size:12px
 }
