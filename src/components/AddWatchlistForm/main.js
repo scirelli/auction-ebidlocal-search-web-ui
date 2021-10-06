@@ -210,7 +210,7 @@ class WatchlistForm extends HTMLElement{
         for(var pair of (new FormData(form)).entries()) {
             data[pair[0]] = pair[1];
         }
-        data.list = Array.prototype.slice.call(this.watchlistElem.querySelectorAll('button')).map(e=>e.value.trim());
+        data.list = Array.prototype.slice.call(this.watchlistElem.querySelectorAll('button.keyword')).map(e=>e.value.trim());
         fetch(decodeURI(form.action).mustache(data), {
             method:  form.method,
             cache:   'no-cache',
